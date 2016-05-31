@@ -122,6 +122,7 @@ public class ActionHandler {
     public static final String SYSTEMUI_TASK_SOUNDMODE_VIB_SILENT = "task_soundmode_vib_silent";
     public static final String SYSTEMUI_TASK_WAKE_DEVICE = "task_wake_device";
     public static final String SYSTEMUI_TASK_STOP_SCREENPINNING = "task_stop_screenpinning";
+    public static final String SYSTEMUI_TASK_APP_PICKER = "task_app_picker";
 
     public static final String INTENT_SHOW_POWER_MENU = "action_handler_show_power_menu";
     public static final String INTENT_TOGGLE_SCREENRECORD = "action_handler_toggle_screenrecord";
@@ -156,7 +157,8 @@ public class ActionHandler {
         ImeArrowDown(SYSTEMUI_TASK_IME_NAVIGATION_DOWN, SYSTEMUI, "label_action_ime_down", "ic_sysbar_ime_down"),
         ImeArrowLeft(SYSTEMUI_TASK_IME_NAVIGATION_LEFT, SYSTEMUI, "label_action_ime_left", "ic_sysbar_ime_left"),
         ImeArrowRight(SYSTEMUI_TASK_IME_NAVIGATION_RIGHT, SYSTEMUI, "label_action_ime_right", "ic_sysbar_ime_right"),
-        ImeArrowUp(SYSTEMUI_TASK_IME_NAVIGATION_UP, SYSTEMUI, "label_action_ime_up", "ic_sysbar_ime_up");
+        ImeArrowUp(SYSTEMUI_TASK_IME_NAVIGATION_UP, SYSTEMUI, "label_action_ime_up", "ic_sysbar_ime_up"),
+        AppPicker(SYSTEMUI_TASK_APP_PICKER, SYSTEMUI, "label_action_app_picker", "ic_sysbar_app_picker");
 
         String mAction;
         String mResPackage;
@@ -192,7 +194,8 @@ public class ActionHandler {
             SystemAction.Screenrecord, SystemAction.Ime,
             SystemAction.StopScreenPinning, SystemAction.ImeArrowDown,
             SystemAction.ImeArrowLeft, SystemAction.ImeArrowRight,
-            SystemAction.ImeArrowUp, SystemAction.InAppSearch
+            SystemAction.ImeArrowUp, SystemAction.InAppSearch,
+            SystemAction.AppPicker
     };
 
     public static class ActionIconResources {
@@ -565,6 +568,9 @@ public class ActionHandler {
                 }
             }
             return;
+        } else if (action.equals(SYSTEMUI_TASK_APP_PICKER)) {
+            startAppPicker(context);
+            return;
         }
     }
 
@@ -918,5 +924,17 @@ public class ActionHandler {
     private static void showPowerMenu(Context context) {
         context.sendBroadcastAsUser(new Intent(INTENT_SHOW_POWER_MENU), new UserHandle(
                 UserHandle.USER_ALL));
+    }
+
+    private static void startAppPicker(Context context) {
+        final Intent APP_PICKER = new Intent().setComponent(new ComponentName(
+            "com.android.systemui", "com.android.systemui.aicp.apppicker.AppPickerActivity"));
+        if (APP_PICKER != null) {
+            try {
+                context.startActivityAsUser(APP_PICKER, UserHandle.CURRENT);
+            } catch (ActivityNotFoundException e) {
+                Slog.w(TAG, "No activity to handle application picker.", e);
+            }
+        }
     }
 }
