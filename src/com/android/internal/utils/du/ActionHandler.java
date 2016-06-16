@@ -123,6 +123,7 @@ public class ActionHandler {
     public static final String SYSTEMUI_TASK_WAKE_DEVICE = "task_wake_device";
     public static final String SYSTEMUI_TASK_STOP_SCREENPINNING = "task_stop_screenpinning";
     public static final String SYSTEMUI_TASK_APP_PICKER = "task_app_picker";
+    public static final String SYSTEMUI_TASK_NOTIFICATION_CLEAR = "task_notification_clear";
 
     public static final String INTENT_SHOW_POWER_MENU = "action_handler_show_power_menu";
     public static final String INTENT_TOGGLE_SCREENRECORD = "action_handler_toggle_screenrecord";
@@ -158,7 +159,8 @@ public class ActionHandler {
         ImeArrowLeft(SYSTEMUI_TASK_IME_NAVIGATION_LEFT, SYSTEMUI, "label_action_ime_left", "ic_sysbar_ime_left"),
         ImeArrowRight(SYSTEMUI_TASK_IME_NAVIGATION_RIGHT, SYSTEMUI, "label_action_ime_right", "ic_sysbar_ime_right"),
         ImeArrowUp(SYSTEMUI_TASK_IME_NAVIGATION_UP, SYSTEMUI, "label_action_ime_up", "ic_sysbar_ime_up"),
-        AppPicker(SYSTEMUI_TASK_APP_PICKER, SYSTEMUI, "label_action_app_picker", "ic_sysbar_app_picker");
+        AppPicker(SYSTEMUI_TASK_APP_PICKER, SYSTEMUI, "label_action_app_picker", "ic_sysbar_app_picker"),
+        NotificationClear(SYSTEMUI_TASK_NOTIFICATION_CLEAR, SYSTEMUI, "label_action_notification_clear", "ic_qs_clear_notifications");
 
         String mAction;
         String mResPackage;
@@ -195,7 +197,7 @@ public class ActionHandler {
             SystemAction.StopScreenPinning, SystemAction.ImeArrowDown,
             SystemAction.ImeArrowLeft, SystemAction.ImeArrowRight,
             SystemAction.ImeArrowUp, SystemAction.InAppSearch,
-            SystemAction.AppPicker
+            SystemAction.AppPicker, SystemAction.NotificationClear
     };
 
     public static class ActionIconResources {
@@ -357,6 +359,16 @@ public class ActionHandler {
             if (service != null) {
                 try {
                     service.showCustomIntentAfterKeyguard(intent);
+                } catch (RemoteException e) {
+                }
+            }
+        }
+
+        private static void clearAllNotifications() {
+            IStatusBarService service = getStatusBarService();
+            if (service != null) {
+                try {
+                    service.onClearAllNotifications(ActivityManager.getCurrentUser());
                 } catch (RemoteException e) {
                 }
             }
@@ -570,6 +582,9 @@ public class ActionHandler {
             return;
         } else if (action.equals(SYSTEMUI_TASK_APP_PICKER)) {
             startAppPicker(context);
+            return;
+        } else if (action.equals(SYSTEMUI_TASK_NOTIFICATION_CLEAR)) {
+            StatusBarHelper.clearAllNotifications();
             return;
         }
     }
